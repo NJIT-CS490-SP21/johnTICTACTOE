@@ -27,6 +27,11 @@ def on_connect():
 def on_disconnect():
     print('User disconnected!')
     
+@socketio.on('login')
+def on_login(data):
+    print(data)
+    socketio.emit('login', data, broadcast=True, include_self=False)
+    
 @socketio.on('boardMove')
 def on_boardMove(data):
     print(str(data))
