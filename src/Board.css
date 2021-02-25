@@ -1,11 +1,44 @@
 .mainBoard {
-    width: 300px; /* Total horizontal dimensions */
-	height: 300px; /* Total vertical dimensions */
-	display: grid; /* Enables CSS Grid */ 
-	grid-template-columns: repeat(3, 1fr); /* Total horizontal space broken into 3 columns */
-	grid-template-rows: repeat(3, 1fr); /* Total vertical space broken into 3 rows */
+    width: 300px;
+	height: 300px;
+	border-radius: 10px;
+	border: 4px solid black;
+	display: grid;
+	margin: auto;
+	margin-right: 20px;
+	margin-left: 13%;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
 }
 
 .box {
-    border: 1px solid black; /* Shows the lines in the CSS grid */
+	background: mistyrose;
+	color: black;
+    border: 3px solid black;
+    font-size: 50px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  	justify-content: center;
+    
+}
+
+.mainContain {
+	display: flex;
+}
+
+.userInfo {
+	flex: 1;
+	text-align: left;
+}
+
+.titleClass {
+	text-decoration: underline;
+}
+
+body{
+	background: lightslategray;
+	color: mistyrose;
+	text-align: center;
 }

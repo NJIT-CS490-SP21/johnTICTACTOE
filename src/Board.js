@@ -31,7 +31,6 @@ export function Board(){
                 return prevCount+1;
             });
         } else {
-            console.log(moveCount);
             return;
         }
         
@@ -82,19 +81,47 @@ export function Board(){
     if (isShown) {
         return (
             <div>
-                <h1> Welcome to Tic Tac Toe! </h1>
-                <div class="mainBoard">
-                    {board.map((box, index) => (<Box onClick={() => onClickSquare(index)} letter={box} />))}
-                </div>
                 <div>
-                    <h3> List of current players: </h3>
-                    {userList.map((uName) => {
-                        if (uName === username) {
-                            return <div>{uName} (You)</div>; 
-                        } else {
-                            return <div>{uName}</div>;
-                        }
-                    })}
+                    <h1> Welcome to Tic Tac Toe! </h1>
+                </div>
+                <div class="mainContain">
+                    <div class="mainBoard">
+                        {board.map((box, index) => (<Box onClick={() => onClickSquare(index)} letter={box} />))}
+                    </div>
+                    <div class="userInfo">
+                        <h3 class="titleClass"> Active players: </h3>
+                        {userList.map((uName) => {
+                            if (uName === userList[0]) {
+                                if (uName === username) {
+                                    return <div>&emsp;Player X: {uName} (You)</div>; 
+                                } else {
+                                    return <div>&emsp;Player X: {uName}</div>;
+                                }
+                            } else if (uName === userList[1]) {
+                                if (uName === username) {
+                                    return <div>&emsp;Player O: {uName} (You)</div>; 
+                                } else {
+                                    return <div>&emsp;Player O: {uName}</div>;
+                                }
+                            } else {
+                                if (uName === username) {
+                                    return (
+                                        <div>
+                                        <h3 class="titleClass"> Spectators: </h3>
+                                        <div>&emsp;{uName} (You)</div>
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div>
+                                        <h3 class="titleClass"> Spectators: </h3>
+                                        <div>&emsp;{uName}</div>
+                                        </div>
+                                    );
+                                }
+                            }
+                        })}
+                    </div>
                 </div>
             </div>
         );
