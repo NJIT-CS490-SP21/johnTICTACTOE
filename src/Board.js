@@ -11,6 +11,7 @@ export function Board(){
     const [board, setBoard] = useState(Array(9).fill(null));
     const [userList, setUserList] = useState([]);
     const [username, setUsername] = useState(null);
+    const [isShown, setShown] = useState(false);
 
     function onClickSquare(index) {
         if (board[index] != null) {
@@ -25,11 +26,19 @@ export function Board(){
     }
     
     function onClickButton() {
-        const newUsername = inputRef.current.value;
-        setUsername(newUsername);
-        setUserList(prevList => [...prevList, newUsername]);
-        socket.emit('login', { message: newUsername});
-        
+        if (inputRef != null) {
+            const newUsername = inputRef.current.value;
+            setUsername(newUsername);
+            setUserList(prevList => [...prevList, newUsername]);
+            
+            setShown(prevShown => {
+                return !prevShown;
+            });
+            
+            socket.emit('login', { message: newUsername});
+            
+            
+        }
     }
     
     useEffect(() => {
@@ -50,13 +59,21 @@ export function Board(){
         });
     }, []);
     
-    return (
-        <div>
-            <input ref={inputRef} type="text" />
-            <button onClick={onClickButton}>Enter Username</button>
-            <div class="mainBoard">
-                {board.map((box, index) => (<Box onClick={() => onClickSquare(index)} letter={box} />))}
+    
+    if (isShown) {
+        return (
+            <div>
+                <div class="mainBoard">
+                    {board.map((box, index) => (<Box onClick={() => onClickSquare(index)} letter={box} />))}
+                </div>
             </div>
-        </div>
-    );
+        );
+    } else {
+       return (
+            <div>
+                <input ref={inputRef} type="text" />
+                <button onClick={onClickButton}>Enter Username</button>
+            </div>
+        ); 
+    }
 }
