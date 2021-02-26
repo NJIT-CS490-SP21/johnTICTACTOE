@@ -4,9 +4,6 @@
 	border-radius: 10px;
 	border: 4px solid black;
 	display: grid;
-	margin: auto;
-	margin-right: 20px;
-	margin-left: 13%;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
 }
@@ -26,10 +23,12 @@
 
 .mainContain {
 	display: flex;
+    justify-content: center;
+    width: 100%; 
 }
 
 .userInfo {
-	flex: 1;
+	padding: 2%;
 	text-align: left;
 }
 
