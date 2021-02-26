@@ -11,6 +11,9 @@ function App() {
     const [userList, setUserList] = useState([]);
     const [username, setUsername] = useState(null);
     const [isShown, setShown] = useState(false);
+    const [board, setBoard] = useState(Array(9).fill(null));
+    const [moveCount, setCount] = useState(1); //odd = x, even = o
+    const winner = calculateWinner(board);
   
     function onClickButton() {
         if (inputRef != null) {
@@ -26,6 +29,35 @@ function App() {
         }
     }
     
+    //function taken from https://reactjs.org/tutorial/tutorial.html
+    function calculateWinner(board) {
+        const lines = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
+        ];
+        for (let i = 0; i < lines.length; i++) {
+            const [a, b, c] = lines[i];
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                return board[a];
+            }
+          }
+        
+        //https://stackoverflow.com/a/35895339
+        let notDraw = board.some(function(i) {return i === null});
+        
+        if (notDraw) {
+            return null;
+        } else {
+            return "draw";
+        }
+    }
+    
     useEffect(() => {
         socket.on('login', (data) => {
             console.log('user has logged in');
@@ -38,8 +70,8 @@ function App() {
     return (
       <div>
         <h1> Welcome to Tic Tac Toe! </h1>
-        <div class="mainContain">
-            <Board username={username} setUsername={setUsername} userList={userList} setUserList={setUserList} />
+        <div class="boardAndInfoContain">
+            <Board username={username} userList={userList} board={board} setBoard={setBoard} moveCount={moveCount} setCount={setCount} winner={winner}/>
             <div class="userInfo">
                 <h3 class="titleClass"> Active players: </h3>
                 {userList.map((uName) => {
@@ -75,6 +107,21 @@ function App() {
                 })}
             </div>
         </div>
+        {winner === "X" && (
+            <div>
+                <h1>{userList[0]} has won the game!</h1>
+            </div>
+        )}
+        {winner === "O" && (
+            <div>
+                <h1>{userList[1]} has won the game!</h1>
+            </div>
+        )}
+        {winner === "draw" && (
+            <div>
+                <h1>Its a draw!</h1>
+            </div>
+        )}
       </div>
     );
   } else {
@@ -87,10 +134,6 @@ function App() {
       </div>
     ); 
   }
-  
-  
-  
-  
 }
 
 export default App;
