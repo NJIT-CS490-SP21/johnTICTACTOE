@@ -159,18 +159,57 @@ function App() {
             <div>
                 <h1>{userList[0]} has won the game!</h1>
                 <button onClick={replayButton}>Click to play again</button>
+                <div>
+                    {replayClicked.length === 2 && (
+                        <div>
+                            <h4>{replayClicked[0]} wants to play again!</h4>
+                            <h4>{replayClicked[1]} wants to play again!</h4>
+                        </div>
+                    )}
+                    {replayClicked.length === 1 && (
+                        <div>
+                            <h4>{replayClicked[0]} wants to play again!</h4>
+                        </div>
+                    )}
+                </div>
             </div>
         )}
         {winner === "O" && (
             <div>
                 <h1>{userList[1]} has won the game!</h1>
                 <button onClick={replayButton}>Click to play again</button>
+                <div>
+                    {replayClicked.length === 2 && (
+                        <div>
+                            <h4>{replayClicked[0]} wants to play again!</h4>
+                            <h4>{replayClicked[1]} wants to play again!</h4>
+                        </div>
+                    )}
+                    {replayClicked.length === 1 && (
+                        <div>
+                            <h4>{replayClicked[0]} wants to play again!</h4>
+                        </div>
+                    )}
+                </div>
             </div>
         )}
         {winner === "draw" && (
             <div>
                 <h1>Its a draw!</h1>
                 <button onClick={replayButton}>Click to play again</button>
+                <div>
+                    {replayClicked.length === 2 && (
+                        <div>
+                            <h4>{replayClicked[0]} wants to play again!</h4>
+                            <h4>{replayClicked[1]} wants to play again!</h4>
+                        </div>
+                    )}
+                    {replayClicked.length === 1 && (
+                        <div>
+                            <h4>{replayClicked[0]} wants to play again!</h4>
+                        </div>
+                    )}
+                </div>
             </div>
         )}
       </div>
