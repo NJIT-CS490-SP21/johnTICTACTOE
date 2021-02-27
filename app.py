@@ -26,12 +26,22 @@ def on_connect():
 @socketio.on('disconnect')
 def on_disconnect():
     print('User disconnected!')
-    
+
 @socketio.on('login')
 def on_login(data):
     print(data)
     socketio.emit('login', data, broadcast=True, include_self=False)
     
+@socketio.on('replay')
+def on_replay(data):
+    print("user wants to replay: "+str(data))
+    socketio.emit('replay', data, broadcast=True, include_self=False)
+
+@socketio.on('reset')
+def on_reset(data):
+    print("game is being reset")
+    socketio.emit('reset', data, broadcast=True, include_self=False)
+
 @socketio.on('boardMove')
 def on_boardMove(data):
     print(str(data))

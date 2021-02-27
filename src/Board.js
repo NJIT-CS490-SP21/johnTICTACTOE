@@ -1,9 +1,6 @@
 import React from 'react';
 import { useState, useRef, useEffect} from 'react';
 import { Box } from './Box.js';
-import io from 'socket.io-client';
-
-const socket = io();
 
 export function Board(props){
     
@@ -30,13 +27,13 @@ export function Board(props){
         props.setBoard(prevBoard => {
             const boardCopy = [...prevBoard];
             boardCopy[index] = move;
-            socket.emit('boardMove', { index: index, move: move, count: props.moveCount+1});
+            props.socket.emit('boardMove', { index: index, move: move, count: props.moveCount+1});
             return boardCopy;
         });
     }
     
     useEffect(() => {
-        socket.on('boardMove', (data) => {
+        props.socket.on('boardMove', (data) => {
             console.log('move has been received');
             console.log(data);
             props.setCount(data.count);

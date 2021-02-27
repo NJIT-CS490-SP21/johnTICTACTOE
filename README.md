@@ -4,7 +4,7 @@
 ## TODO ---------------<><><><><><><><><><>
 2. (not required) add functionality so someone who joins late gets the current state of users and the board
 3. update readme
-4. add function for both plays to agree for a reset -> this should update the board to empty for everyone
+4. (not required) add little check boxes that fill when the user says yes to replaying, maybe add a delay so that both are filled for a couple seconds before reset?
 5. (not required) try to make list update when user logs out?
 6. deploy to heroku
 

@@ -14,6 +14,8 @@ function App() {
     const [board, setBoard] = useState(Array(9).fill(null));
     const [moveCount, setCount] = useState(1); //odd = x, even = o
     const winner = calculateWinner(board);
+    const [replayClicked, setReplayClicked] = useState([]);
+    const [clickCounter, setClickCounter] = useState(0);
   
     function onClickButton() {
         if (inputRef != null) {
@@ -26,6 +28,37 @@ function App() {
             });
             
             socket.emit('login', { uName: newUsername});
+        }
+    }
+    
+    function replayButton() {
+        if (username === userList[0] || username === userList[1]){
+            if (username === replayClicked[0] || username === replayClicked[1]) {
+                return;
+            }
+            setReplayClicked(prevList => [...prevList, username]);
+            setClickCounter((prevCount) => {
+                return prevCount+1;
+            });
+            socket.emit('replay', { uName: username, clickCount: clickCounter+1});
+            //issues with the above and below statement because the clickcounter state isnt set in time 
+            //for the emit and also the reset game function, so I add 1 to the emit and also when i go into the if statement in resetGame function because thats what it 
+            //will end up being in the future, this is because setState is asynchronous and wont update when u think it will.
+            //in the future i will try to get around this using useEffect, but for now this works.
+            resetGame();
+        } else {
+            return;
+        }
+    }
+    
+    function resetGame() {
+        if(clickCounter+1 === 2){
+            const boardReset=Array(9).fill(null);
+            setBoard(boardReset);
+            setCount(1);
+            setReplayClicked([]);
+            setClickCounter(0);
+            socket.emit('reset', {boardReset: boardReset});
         }
     }
     
@@ -64,6 +97,21 @@ function App() {
             console.log(data);
             setUserList(prevList => [...prevList, data.uName]);
         });
+        
+        socket.on('replay', (data) => {
+            console.log('user has chosen to replay');
+            console.log(data);
+            setReplayClicked(prevList => [...prevList, data.uName]);
+            setClickCounter(data.clickCount);
+        });
+        
+        socket.on('reset', (data) => {
+            console.log('game is being reset');
+            setBoard(data.boardReset);
+            setCount(1);
+            setReplayClicked([]);
+            setClickCounter(0);
+        });
     }, []);
   
   if (isShown) {
@@ -71,7 +119,7 @@ function App() {
       <div>
         <h1> Welcome to Tic Tac Toe! </h1>
         <div class="boardAndInfoContain">
-            <Board username={username} userList={userList} board={board} setBoard={setBoard} moveCount={moveCount} setCount={setCount} winner={winner}/>
+            <Board username={username} userList={userList} board={board} setBoard={setBoard} moveCount={moveCount} setCount={setCount} winner={winner} socket={socket}/>
             <div class="userInfo">
                 <h3 class="titleClass"> Active players: </h3>
                 {userList.map((uName) => {
@@ -110,16 +158,19 @@ function App() {
         {winner === "X" && (
             <div>
                 <h1>{userList[0]} has won the game!</h1>
+                <button onClick={replayButton}>Click to play again</button>
             </div>
         )}
         {winner === "O" && (
             <div>
                 <h1>{userList[1]} has won the game!</h1>
+                <button onClick={replayButton}>Click to play again</button>
             </div>
         )}
         {winner === "draw" && (
             <div>
                 <h1>Its a draw!</h1>
+                <button onClick={replayButton}>Click to play again</button>
             </div>
         )}
       </div>
