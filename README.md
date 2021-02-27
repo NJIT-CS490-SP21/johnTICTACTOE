@@ -1,6 +1,6 @@
 # Project 2 - Tic Tac Toe
 
-## Heroku site link: 
+## Heroku site link for milestone 1: https://serene-sands-43727.herokuapp.com/
 
 ## Technologies, Frameworks, Libraries
 * Technologies: Cloud9, Heroku, Python, JavaScript, HTML, CSS
