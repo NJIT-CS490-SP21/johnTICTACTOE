@@ -135,21 +135,15 @@ function App() {
                         } else {
                             return <div>&emsp;Player O : {uName}</div>;
                         }
-                    } else {
+                    }
+                })}
+                <h3 class="titleClass"> Spectators: </h3>
+                {userList.map((uName, index) => {
+                    if (index>1) {    
                         if (uName === username) {
-                            return (
-                                <div>
-                                <h3 class="titleClass"> Spectators: </h3>
-                                <div>&emsp;{uName} (You)</div>
-                                </div>
-                            );
+                            return <div>&emsp;{uName} (You)</div>;
                         } else {
-                            return (
-                                <div>
-                                <h3 class="titleClass"> Spectators: </h3>
-                                <div>&emsp;{uName}</div>
-                                </div>
-                            );
+                            return <div>&emsp;{uName}</div>;
                         }
                     }
                 })}
