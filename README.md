@@ -23,6 +23,7 @@
 1. Run command in terminal (in your project directory): `python app.py`
 2. Run command in another terminal, `cd` into the project directory, and run `npm run start`
 3. Preview web page in browser '/'
+* As of right now, all users must open the app before anyone logs in for things to work properly.
 
 ## Deploy to Heroku
 1. Create a Heroku app: `heroku create --buildpack heroku/python`
@@ -36,4 +37,5 @@
 * **_Known Problems / Additional Features_**:
    1. Currently, there is a problem where the list of current players/spectators does not update as they leave. To solve this problem, I believe I would need to have an ongoing list in app.py that updates as users login and disconnet. From this list I'm hoping I'll be able to emit an event to all users whenever the list is changed. This will take more research and more testing, which I don't have enough time to get done before milestone 1 is due.
    2. Another current problem is that I want the text at the bottom of the screen that pops up saying "Player ... wants to play again!" to show that both players hit the accept button for a couple seconds before the board resets and the text disappears. I believe that I might be able to achieve this with some combination of `async` and `await` but I need to do more research and testing, and again I don't have enough time to get this done before milestone 1 is due.
+   3. Related to problem number one, in order for the app to work properly all users (or in the case of testing, all the tabs) need to have the app open before anyone logs in. I want to fix this in the future so that users can open the app late and login after other users already have, and still have the current list of all users before they got there. I also want to do this same thing for the current state of the board. Although I want to fix these issues soon, they were not required (requirements got removed) in milestone 1, and I did not have time at the end to get it working before it was due.
         
