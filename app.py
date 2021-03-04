@@ -44,7 +44,14 @@ def on_disconnect():
 @socketio.on('login')
 def on_login(data):
     print(data)
+    #database adding new user, we should also query the databse and emit the whole thing back to client when they login
+    new_user = models.Player(username=data['uName'], score=100)
+    db.session.add(new_user)
+    db.session.commit()
+    all_players = models.Player.query.all()
+    leaderboardData={'leaderboard': all_players}
     socketio.emit('login', data, broadcast=True, include_self=False)
+    socketio.emit('leaderboardUpdate', leaderboardData, broadcast=True, include_self=True)
     
 @socketio.on('replay')
 def on_replay(data):

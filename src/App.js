@@ -21,8 +21,11 @@ function App() {
     
     //list of users who clicked replay (can only be the 2 players)
     const [replayClicked, setReplayClicked] = useState([]);
+    
+    //leaderboard state
+    const [leaderboard, setLeaderboard] = useState([]);
   
-    function onClickButton() {
+    function onClickShowBoardButton() {
         if (inputRef != null) {
             const newUsername = inputRef.current.value;
             setUsername(newUsername);
@@ -94,6 +97,12 @@ function App() {
             console.log('user has logged in');
             console.log(data);
             setUserList(prevList => [...prevList, data.uName]);
+        });
+        
+        socket.on('leaderboardUpdate', (data) => {
+           //set leaderboard to whatever us passed in under data.leaderboard itll be an object of id,username,and score check m1 tips for how to deal with this object
+            console.log(data);
+            setLeaderboard(data.leaderboard); 
         });
         
         socket.on('replay', (data) => {
@@ -210,7 +219,7 @@ function App() {
         <h1> Welcome to Tic Tac Toe! </h1>
         <h2> Enter a username before playing </h2>
         <input ref={inputRef} type="text" />
-        <button onClick={onClickButton}>Enter Username</button>
+        <button onClick={onClickShowBoardButton}>Enter Username</button>
       </div>
     ); 
   }
