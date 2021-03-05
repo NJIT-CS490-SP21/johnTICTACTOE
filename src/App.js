@@ -24,8 +24,9 @@ function App() {
     
     //leaderboard state
     const [leaderboard, setLeaderboard] = useState([]);
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
   
-    function onClickShowBoardButton() {
+    function onClickLoginButton() {
         if (inputRef != null) {
             const newUsername = inputRef.current.value;
             setUsername(newUsername);
@@ -37,6 +38,12 @@ function App() {
             
             socket.emit('login', { uName: newUsername});
         }
+    }
+    
+    function onClickBoardButton() {
+        setShowLeaderboard(prevState => {
+            return !prevState;
+        });
     }
     
     function replayButton() {
@@ -100,9 +107,9 @@ function App() {
         });
         
         socket.on('leaderboardUpdate', (data) => {
-           //set leaderboard to whatever us passed in under data.leaderboard itll be an object of id,username,and score check m1 tips for how to deal with this object
+            console.log("leaderboard update");
             console.log(data);
-            setLeaderboard(data.leaderboard); 
+            setLeaderboard(data); 
         });
         
         socket.on('replay', (data) => {
@@ -153,6 +160,32 @@ function App() {
                     }
                 })}
             </div>
+            {showLeaderboard 
+            ? 
+                <div>
+                    <button onClick={onClickBoardButton}> Hide Leaderboard </button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="2"> Leaderboard </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {leaderboard && leaderboard.map((player) => {
+                                return (
+                                    <tr>
+                                        <td>{player.username}</td>
+                                        <td>{player.score}</td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            : <div>
+                <button onClick={onClickBoardButton}> Show Leaderboard </button>
+            </div>
+        }
         </div>
         {winner === "X" && (
             <div>
@@ -219,7 +252,7 @@ function App() {
         <h1> Welcome to Tic Tac Toe! </h1>
         <h2> Enter a username before playing </h2>
         <input ref={inputRef} type="text" />
-        <button onClick={onClickShowBoardButton}>Enter Username</button>
+        <button onClick={onClickLoginButton}>Enter Username</button>
       </div>
     ); 
   }

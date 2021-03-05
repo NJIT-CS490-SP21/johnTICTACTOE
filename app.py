@@ -44,14 +44,18 @@ def on_disconnect():
 @socketio.on('login')
 def on_login(data):
     print(data)
-    #database adding new user, we should also query the databse and emit the whole thing back to client when they login
     new_user = models.Player(username=data['uName'], score=100)
-    db.session.add(new_user)
-    db.session.commit()
+    #below line with help from https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+    alreadyInDB = db.session.query(models.Player).filter_by(username=data['uName']).first()
+    if not alreadyInDB:
+        db.session.add(new_user)
+        db.session.commit()
     all_players = models.Player.query.all()
-    leaderboardData={'leaderboard': all_players}
+    leaderboard = []
+    for player in all_players:
+        leaderboard.append({'username':player.username, 'score':player.score})
     socketio.emit('login', data, broadcast=True, include_self=False)
-    socketio.emit('leaderboardUpdate', leaderboardData, broadcast=True, include_self=True)
+    socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
     
 @socketio.on('replay')
 def on_replay(data):
