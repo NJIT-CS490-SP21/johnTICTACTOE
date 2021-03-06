@@ -10,7 +10,7 @@
 
 .box {
 	background: mistyrose;
-	color: black;
+	color: darkslategrey;
     border: 3px solid darkslategrey;
     font-size: 50px;
     font-weight: 500;
@@ -44,7 +44,6 @@ body{
 table {
 	border: solid 3.5px darkslategrey;
     border-collapse: collapse;
-    border-spacing: 0;
 }
 
 tbody,

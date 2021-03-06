@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useRef, useEffect} from 'react';
+import {useEffect} from 'react';
 import { Box } from './Box.js';
 
 export function Board(props){
@@ -34,7 +34,7 @@ export function Board(props){
     
     useEffect(() => {
         props.socket.on('boardMove', (data) => {
-            console.log('move has been receiveddd'+props.username);
+            console.log('move has been received');
             console.log(data);
             props.setCount(data.count);
             props.setBoard(prevBoard => {

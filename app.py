@@ -59,7 +59,6 @@ def on_login(data):
 
 @socketio.on('winner')
 def on_winner(data):
-    #update db with new scores for winner and loser, emit a leaderboard update??
     print(data)
     winnerName = data['winner']
     loserName = data['loser']
