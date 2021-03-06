@@ -124,7 +124,20 @@ function App() {
             setCount(1);
             setReplayClicked([]);
         });
+        
     }, []);
+    
+    useEffect(() => {
+        if (winner === "X") {
+            if (username === userList[0]) {
+                socket.emit('winner', {winner: userList[0], loser: userList[1]});
+            }
+        } else if (winner === "O") {
+            if (username === userList[1]) {
+                socket.emit('winner', {winner: userList[1], loser: userList[0]});
+            }
+        }
+    }, [winner]);
   
   if (isShown) {
     return (
@@ -172,12 +185,21 @@ function App() {
                         </thead>
                         <tbody>
                             {leaderboard && leaderboard.map((player) => {
-                                return (
+                                if (player.username === username) {
+                                    return (
+                                    <tr>
+                                        <td>{player.username} (you)</td>
+                                        <td>{player.score}</td>
+                                    </tr>
+                                    );
+                                } else {
+                                    return (
                                     <tr>
                                         <td>{player.username}</td>
                                         <td>{player.score}</td>
                                     </tr>
-                                );
+                                    );
+                                }
                             })}
                         </tbody>
                     </table>

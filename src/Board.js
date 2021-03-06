@@ -27,14 +27,14 @@ export function Board(props){
         props.setBoard(prevBoard => {
             const boardCopy = [...prevBoard];
             boardCopy[index] = move;
-            props.socket.emit('boardMove', { index: index, move: move, count: props.moveCount+1});
             return boardCopy;
         });
+        props.socket.emit('boardMove', { index: index, move: move, count: props.moveCount+1});
     }
     
     useEffect(() => {
         props.socket.on('boardMove', (data) => {
-            console.log('move has been received');
+            console.log('move has been receiveddd'+props.username);
             console.log(data);
             props.setCount(data.count);
             props.setBoard(prevBoard => {

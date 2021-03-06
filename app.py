@@ -50,12 +50,28 @@ def on_login(data):
     if not alreadyInDB:
         db.session.add(new_user)
         db.session.commit()
-    all_players = models.Player.query.all()
+    all_players = db.session.query(models.Player).order_by(models.Player.score.desc())
     leaderboard = []
     for player in all_players:
         leaderboard.append({'username':player.username, 'score':player.score})
     socketio.emit('login', data, broadcast=True, include_self=False)
     socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
+
+@socketio.on('winner')
+def on_winner(data):
+    #update db with new scores for winner and loser, emit a leaderboard update??
+    print(data)
+    winnerName = data['winner']
+    loserName = data['loser']
+    db.session.query(models.Player).filter_by(username=winnerName).update({"score": (models.Player.score +1)})
+    db.session.query(models.Player).filter_by(username=loserName).update({"score": (models.Player.score -1)})
+    db.session.commit()
+    all_players = db.session.query(models.Player).order_by(models.Player.score.desc())
+    leaderboard = []
+    for player in all_players:
+        leaderboard.append({'username':player.username, 'score':player.score})
+    socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
+    
     
 @socketio.on('replay')
 def on_replay(data):
