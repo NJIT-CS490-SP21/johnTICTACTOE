@@ -1,6 +1,6 @@
 # Project 2 - Tic Tac Toe
 
-## Heroku site link for milestone 2: https://pure-retreat-29979.herokuapp.com/
+## Heroku site link for milestone 3: https://powerful-headland-79474.herokuapp.com/
 * As of right now, all users must open the app before anyone logs in for things to work properly.
 
 ## Technologies, Frameworks, Libraries
