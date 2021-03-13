@@ -30,12 +30,9 @@ function App() {
         if (inputRef != null) {
             const newUsername = inputRef.current.value;
             setUsername(newUsername);
-            setUserList(prevList => [...prevList, newUsername]);
-            
             setShown(prevShown => {
                 return !prevShown;
             });
-            
             socket.emit('login', { uName: newUsername});
         }
     }
@@ -103,7 +100,7 @@ function App() {
         socket.on('login', (data) => {
             console.log('user has logged in');
             console.log(data);
-            setUserList(prevList => [...prevList, data.uName]);
+            setUserList(data);
         });
         
         socket.on('leaderboardUpdate', (data) => {
@@ -138,7 +135,20 @@ function App() {
             }
         }
     }, [winner]);
-  
+    
+    //only seems to work on refresh
+    useEffect(() => {
+        const cleanup = () => {
+            socket.emit('leave', {uName: username});
+        };
+
+        window.addEventListener('beforeunload', cleanup);
+
+        return () => {
+            window.removeEventListener('beforeunload', cleanup);
+        };
+    }, [username]);
+    
   if (isShown) {
     return (
       <div>

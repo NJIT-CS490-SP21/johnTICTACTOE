@@ -28,6 +28,8 @@ socketio = SocketIO(
     manage_session=False
 )
 
+userList = []
+
 @app.route('/', defaults={"filename": "index.html"})
 @app.route('/<path:filename>')
 def index(filename):
@@ -44,6 +46,7 @@ def on_disconnect():
 @socketio.on('login')
 def on_login(data):
     print(data)
+    userList.append(data['uName'])
     new_user = models.Player(username=data['uName'], score=100)
     #below line with help from https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
     alreadyInDB = db.session.query(models.Player).filter_by(username=data['uName']).first()
@@ -54,7 +57,7 @@ def on_login(data):
     leaderboard = []
     for player in all_players:
         leaderboard.append({'username':player.username, 'score':player.score})
-    socketio.emit('login', data, broadcast=True, include_self=False)
+    socketio.emit('login', userList, broadcast=True, include_self=True)
     socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
 
 @socketio.on('winner')
@@ -71,7 +74,13 @@ def on_winner(data):
         leaderboard.append({'username':player.username, 'score':player.score})
     socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
     
-    
+@socketio.on('leave')
+def on_leave(data):
+    print(data)
+    userList.remove(data['uName'])
+    print(userList)
+    socketio.emit('login', userList, broadcast=True, include_self=False)
+
 @socketio.on('replay')
 def on_replay(data):
     print("user wants to replay: "+str(data))

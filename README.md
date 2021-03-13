@@ -1,7 +1,6 @@
 # Project 2 - Tic Tac Toe
 
 ## Heroku site link for milestone 3: https://powerful-headland-79474.herokuapp.com/
-* As of right now, all users must open the app before anyone logs in for things to work properly.
 
 ## Technologies, Frameworks, Libraries
 * Technologies: Cloud9, Heroku, Python, JavaScript, HTML, CSS
@@ -27,7 +26,6 @@
 1. Run command in terminal (in your project directory): `python app.py`
 2. Run command in another terminal, `cd` into the project directory, and run `npm run start`
 3. Preview web page in browser '/'
-* As of right now, all users must open the app before anyone logs in for things to work properly.
 
 ## Deploy to Heroku
 1. First login: `heroku login -i`
