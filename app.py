@@ -51,20 +51,8 @@ def on_disconnect():
     print('User disconnected!')
 
 
-@SOCKETIO.on('login')
-def on_login(data):
-    """"This function is used when the socket receives a login event,
-        updating the users in the DB and sending back the updated userlist and database"""
-    print(data)
-    USER_LIST.append(data['uName'])
-    new_user = models.Player(username=data['uName'], score=100)
-    #below line with help from
-    #stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
-    already_in_db = DB.session.query(
-        models.Player).filter_by(username=data['uName']).first()
-    if not already_in_db:
-        DB.session.add(new_user)
-        DB.session.commit()
+def get_leaderboard():
+    """Used to make following functions more modular"""
     all_players = DB.session.query(models.Player).order_by(
         models.Player.score.desc())
     leaderboard = []
@@ -73,6 +61,29 @@ def on_login(data):
             'username': player.username,
             'score': player.score
         })
+    return leaderboard
+
+
+def add_player(username):
+    """Used to make following functions more modular"""
+    new_user = models.Player(username=username, score=100)
+    DB.session.add(new_user)
+    DB.session.commit()
+    return get_leaderboard()
+
+
+@SOCKETIO.on('login')
+def on_login(data):
+    """"This function is used when the socket receives a login event,
+        updating the users in the DB and sending back the updated userlist and database"""
+    print(data)
+    USER_LIST.append(data['uName'])
+    #below line with help from
+    #stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+    already_in_db = DB.session.query(
+        models.Player).filter_by(username=data['uName']).first()
+    if not already_in_db:
+        leaderboard = add_player(data['uName'])
     SOCKETIO.emit('login', USER_LIST, broadcast=True, include_self=True)
     SOCKETIO.emit('leaderboardUpdate',
                   leaderboard,
@@ -93,14 +104,7 @@ def on_winner(data):
     DB.session.query(models.Player).filter_by(username=loser_name).update(
         {"score": (models.Player.score - 1)})
     DB.session.commit()
-    all_players = DB.session.query(models.Player).order_by(
-        models.Player.score.desc())
-    leaderboard = []
-    for player in all_players:
-        leaderboard.append({
-            'username': player.username,
-            'score': player.score
-        })
+    leaderboard = get_leaderboard()
     SOCKETIO.emit('leaderboardUpdate',
                   leaderboard,
                   broadcast=True,
@@ -122,7 +126,6 @@ def on_leave(data):
 def on_replay(data):
     """"This function is used when the socket receives a replay event,
         which then sends to all users that the user that clicked replay wants to replay"""
-    print("user wants to replay: " + str(data))
     SOCKETIO.emit('replay', data, broadcast=True, include_self=False)
 
 
@@ -130,7 +133,6 @@ def on_replay(data):
 def on_reset(data):
     """"This function is used when the socket receives a reset event,
         and then sends out an event which tells all users to reset the board"""
-    print("game is being reset")
     SOCKETIO.emit('reset', data, broadcast=True, include_self=False)
 
 
@@ -138,7 +140,6 @@ def on_reset(data):
 def on_board_move(data):
     """"This function is used when the socket receives a board move,
         and then sends out an event which tells all users where that move was"""
-    print(str(data))
     SOCKETIO.emit('boardMove', data, broadcast=True, include_self=False)
 
 
