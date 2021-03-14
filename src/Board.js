@@ -1,54 +1,61 @@
-import React from 'react';
-import {useEffect} from 'react';
-import { Box } from './Box.js';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import Box from './Box';
 
-export function Board(props){
-    
-    function onClickSquare(index) {
-        if (props.board[index] != null  || props.winner) {
-            return;
-        }
-        
-        let move = "ERROR";
-        if (props.username === props.userList[0] && props.moveCount%2===1) {
-            move = "X";
-            props.setCount((prevCount) => {
-                return prevCount+1;
-            });
-        } else if (props.username === props.userList[1] && props.moveCount%2===0) {
-            move = "O";
-            props.setCount((prevCount) => {
-                return prevCount+1;
-            });
-        } else {
-            return;
-        }
-        
-        props.setBoard(prevBoard => {
-            const boardCopy = [...prevBoard];
-            boardCopy[index] = move;
-            return boardCopy;
-        });
-        props.socket.emit('boardMove', { index: index, move: move, count: props.moveCount+1});
+function Board({ username, userList, board, setBoard, moveCount, setCount, winner, socket }) {
+  function onClickSquare(index) {
+    if (board[index] != null || winner) {
+      return;
     }
-    
-    useEffect(() => {
-        props.socket.on('boardMove', (data) => {
-            console.log('move has been received');
-            console.log(data);
-            props.setCount(data.count);
-            props.setBoard(prevBoard => {
-                const boardCopy = [...prevBoard];
-                boardCopy[data.index] = data.move;
-                return boardCopy;
-            });
-        });
-    }, []);
-    
-    return (
-        <div class="mainBoard">
-            {props.board.map((box, index) => (<Box onClick={() => onClickSquare(index)} letter={box} />))}
-        </div>
-    );
-    
+
+    let move = 'ERROR';
+    if (username === userList[0] && moveCount % 2 === 1) {
+      move = 'X';
+      setCount((prevCount) => prevCount + 1);
+    } else if (username === userList[1] && moveCount % 2 === 0) {
+      move = 'O';
+      setCount((prevCount) => prevCount + 1);
+    } else {
+      return;
+    }
+
+    setBoard((prevBoard) => {
+      const boardCopy = [...prevBoard];
+      boardCopy[index] = move;
+      return boardCopy;
+    });
+    socket.emit('boardMove', { index, move, count: moveCount + 1 });
+  }
+
+  useEffect(() => {
+    socket.on('boardMove', (data) => {
+      setCount(data.count);
+      setBoard((prevBoard) => {
+        const boardCopy = [...prevBoard];
+        boardCopy[data.index] = data.move;
+        return boardCopy;
+      });
+    });
+  }, []);
+
+  return (
+    <div className="mainBoard">
+      {board.map((box, index) => (
+        <Box onClick={() => onClickSquare(index)} letter={box} />
+      ))}
+    </div>
+  );
 }
+
+Board.propTypes = {
+  username: PropTypes.isRequired,
+  userList: PropTypes.isRequired,
+  board: PropTypes.isRequired,
+  setBoard: PropTypes.isRequired,
+  moveCount: PropTypes.isRequired,
+  setCount: PropTypes.isRequired,
+  winner: PropTypes.isRequired,
+  socket: PropTypes.isRequired,
+};
+
+export default Board;

@@ -1,3 +1,5 @@
+"""This module is the main server for our tic tac toe game,
+    it is made using flask (and other imports seen below)"""
 import os
 from flask import Flask, send_from_directory, json, session
 from flask_socketio import SocketIO
@@ -7,98 +9,142 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-app = Flask(__name__, static_folder='./build/static')
+APP = Flask(__name__, static_folder='./build/static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 # Gets rid of a warning
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-# IMPORTANT: This must be AFTER creating db variable to prevent
+DB = SQLAlchemy(APP)
+# IMPORTANT: This must be AFTER creating DB variable to prevent
 # circular import issues
 import models
-db.create_all()
 
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
+DB.create_all()
 
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",
-    json=json,
-    manage_session=False
-)
+CORS = CORS(APP, resources={r"/*": {"origins": "*"}})
 
-userList = []
+SOCKETIO = SocketIO(APP,
+                    cors_allowed_origins="*",
+                    json=json,
+                    manage_session=False)
 
-@app.route('/', defaults={"filename": "index.html"})
-@app.route('/<path:filename>')
+USER_LIST = []
+
+
+@APP.route('/', defaults={"filename": "index.html"})
+@APP.route('/<path:filename>')
 def index(filename):
+    """"This function is used for initial setup"""
     return send_from_directory('./build', filename)
 
-@socketio.on('connect')
+
+@SOCKETIO.on('connect')
 def on_connect():
+    """"This function is used when socket receives a connection"""
     print('User connected!')
 
-@socketio.on('disconnect')
+
+@SOCKETIO.on('disconnect')
 def on_disconnect():
+    """"This function is used when socket receives a disconnect"""
     print('User disconnected!')
 
-@socketio.on('login')
+
+@SOCKETIO.on('login')
 def on_login(data):
+    """"This function is used when the socket receives a login event,
+        updating the users in the DB and sending back the updated userlist and database"""
     print(data)
-    userList.append(data['uName'])
+    USER_LIST.append(data['uName'])
     new_user = models.Player(username=data['uName'], score=100)
-    #below line with help from https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
-    alreadyInDB = db.session.query(models.Player).filter_by(username=data['uName']).first()
-    if not alreadyInDB:
-        db.session.add(new_user)
-        db.session.commit()
-    all_players = db.session.query(models.Player).order_by(models.Player.score.desc())
+    #below line with help from
+    #stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+    already_in_db = DB.session.query(
+        models.Player).filter_by(username=data['uName']).first()
+    if not already_in_db:
+        DB.session.add(new_user)
+        DB.session.commit()
+    all_players = DB.session.query(models.Player).order_by(
+        models.Player.score.desc())
     leaderboard = []
     for player in all_players:
-        leaderboard.append({'username':player.username, 'score':player.score})
-    socketio.emit('login', userList, broadcast=True, include_self=True)
-    socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
+        leaderboard.append({
+            'username': player.username,
+            'score': player.score
+        })
+    SOCKETIO.emit('login', USER_LIST, broadcast=True, include_self=True)
+    SOCKETIO.emit('leaderboardUpdate',
+                  leaderboard,
+                  broadcast=True,
+                  include_self=True)
 
-@socketio.on('winner')
+
+@SOCKETIO.on('winner')
 def on_winner(data):
+    """"This function is used when socket receives a winner event,
+        it will tell the database to update the scores of the winner/loser
+        and then send back the updated database"""
     print(data)
-    winnerName = data['winner']
-    loserName = data['loser']
-    db.session.query(models.Player).filter_by(username=winnerName).update({"score": (models.Player.score +1)})
-    db.session.query(models.Player).filter_by(username=loserName).update({"score": (models.Player.score -1)})
-    db.session.commit()
-    all_players = db.session.query(models.Player).order_by(models.Player.score.desc())
+    winner_name = data['winner']
+    loser_name = data['loser']
+    DB.session.query(models.Player).filter_by(username=winner_name).update(
+        {"score": (models.Player.score + 1)})
+    DB.session.query(models.Player).filter_by(username=loser_name).update(
+        {"score": (models.Player.score - 1)})
+    DB.session.commit()
+    all_players = DB.session.query(models.Player).order_by(
+        models.Player.score.desc())
     leaderboard = []
     for player in all_players:
-        leaderboard.append({'username':player.username, 'score':player.score})
-    socketio.emit('leaderboardUpdate', leaderboard, broadcast=True, include_self=True)
-    
-@socketio.on('leave')
+        leaderboard.append({
+            'username': player.username,
+            'score': player.score
+        })
+    SOCKETIO.emit('leaderboardUpdate',
+                  leaderboard,
+                  broadcast=True,
+                  include_self=True)
+
+
+@SOCKETIO.on('leave')
 def on_leave(data):
+    """"This function is used when the socket receives a leave event,
+        it should remove the user that left from the list of curent users,
+        and then send out that updated list"""
     print(data)
-    userList.remove(data['uName'])
-    print(userList)
-    socketio.emit('login', userList, broadcast=True, include_self=False)
+    USER_LIST.remove(data['uName'])
+    print(USER_LIST)
+    SOCKETIO.emit('login', USER_LIST, broadcast=True, include_self=False)
 
-@socketio.on('replay')
+
+@SOCKETIO.on('replay')
 def on_replay(data):
-    print("user wants to replay: "+str(data))
-    socketio.emit('replay', data, broadcast=True, include_self=False)
+    """"This function is used when the socket receives a replay event,
+        which then sends to all users that the user that clicked replay wants to replay"""
+    print("user wants to replay: " + str(data))
+    SOCKETIO.emit('replay', data, broadcast=True, include_self=False)
 
-@socketio.on('reset')
+
+@SOCKETIO.on('reset')
 def on_reset(data):
+    """"This function is used when the socket receives a reset event,
+        and then sends out an event which tells all users to reset the board"""
     print("game is being reset")
-    socketio.emit('reset', data, broadcast=True, include_self=False)
+    SOCKETIO.emit('reset', data, broadcast=True, include_self=False)
 
-@socketio.on('boardMove')
-def on_boardMove(data):
+
+@SOCKETIO.on('boardMove')
+def on_board_move(data):
+    """"This function is used when the socket receives a board move,
+        and then sends out an event which tells all users where that move was"""
     print(str(data))
-    socketio.emit('boardMove', data, broadcast=True, include_self=False)
+    SOCKETIO.emit('boardMove', data, broadcast=True, include_self=False)
+
 
 if __name__ == "__main__":
-    socketio.run(
-        app,
+    SOCKETIO.run(
+        APP,
         host=os.getenv('IP', '0.0.0.0'),
         port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', 8081)),
     )
