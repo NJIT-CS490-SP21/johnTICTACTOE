@@ -69,7 +69,6 @@ def add_player(username):
     new_user = models.Player(username=username, score=100)
     DB.session.add(new_user)
     DB.session.commit()
-    return get_leaderboard()
 
 
 def update_user_list(name, command):
@@ -92,7 +91,8 @@ def on_login(data):
     already_in_db = DB.session.query(
         models.Player).filter_by(username=data['uName']).first()
     if not already_in_db:
-        leaderboard = add_player(data['uName'])
+        add_player(data['uName'])
+    leaderboard = get_leaderboard()
     SOCKETIO.emit('login', USER_LIST, broadcast=True, include_self=True)
     SOCKETIO.emit('leaderboardUpdate',
                   leaderboard,
