@@ -6,9 +6,9 @@
 
 - Technologies: Cloud9, Heroku, Python, JavaScript, HTML, CSS
 - Frameworks: Flask
-- Libraries: React.js, os, socketio, cors, SQLAlchemy, dotenv
+- Libraries: React.js, os, socketio, cors, SQLAlchemy, dotenv, unittest, react testing library
 
-## Install Requirements (Milestone 1+2)
+## Install Requirements (Milestone 1+2+3)
 
 - `npm install`
 - `pip install -r requirements.txt`
@@ -41,7 +41,7 @@
 6. Put the database URL in your .env: `touch .env && echo "DATABASE_URL='copy-paste-database-url-here'" > .env`
 7. Push to Heroku: `git push heroku main`
 
-## Questions from rubric
+## Questions from rubric (kept from milestone 2)
 
 - **_Technical Issues encountered_**:
   1.  One technical issue I had was that the moves for each player were being sent to the server twice. After reading through my code and following the flow, I found out that this was because I was sending an emit inside of the `setBoard` function in `Board.js`. After moving it to the outside of the function, it no longer would emit twice.

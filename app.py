@@ -72,12 +72,21 @@ def add_player(username):
     return get_leaderboard()
 
 
+def update_user_list(name, command):
+    """Used to make following functions more modular"""
+    if command == "add":
+        USER_LIST.append(name)
+    if command == "remove":
+        USER_LIST.remove(name)
+    return USER_LIST
+
+
 @SOCKETIO.on('login')
 def on_login(data):
     """"This function is used when the socket receives a login event,
         updating the users in the DB and sending back the updated userlist and database"""
     print(data)
-    USER_LIST.append(data['uName'])
+    update_user_list(data['uName'], "add")
     #below line with help from
     #stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
     already_in_db = DB.session.query(
@@ -91,14 +100,21 @@ def on_login(data):
                   include_self=True)
 
 
+def winner_and_loser(names):
+    """Used to make following functions more modular"""
+    winner = names['winner']
+    loser = names['loser']
+    return [winner, loser]
+
+
 @SOCKETIO.on('winner')
 def on_winner(data):
     """"This function is used when socket receives a winner event,
         it will tell the database to update the scores of the winner/loser
         and then send back the updated database"""
-    print(data)
-    winner_name = data['winner']
-    loser_name = data['loser']
+    names = winner_and_loser(data)
+    winner_name = names[0]
+    loser_name = names[1]
     DB.session.query(models.Player).filter_by(username=winner_name).update(
         {"score": (models.Player.score + 1)})
     DB.session.query(models.Player).filter_by(username=loser_name).update(
@@ -117,7 +133,7 @@ def on_leave(data):
         it should remove the user that left from the list of curent users,
         and then send out that updated list"""
     print(data)
-    USER_LIST.remove(data['uName'])
+    update_user_list(data['uName'], "remove")
     print(USER_LIST)
     SOCKETIO.emit('login', USER_LIST, broadcast=True, include_self=False)
 

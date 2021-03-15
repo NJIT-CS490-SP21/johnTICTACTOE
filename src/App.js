@@ -149,7 +149,7 @@ function App() {
             socket={socket}
           />
           <div className="userInfo">
-            <h3 className="titleClass"> Active players: </h3>
+            <h3 className="titleClass">Active players:</h3>
             {userList.map((uName) => {
               if (uName === userList[0]) {
                 if (uName === username) {
@@ -185,7 +185,7 @@ function App() {
               <table>
                 <thead>
                   <tr>
-                    <th colSpan="2"> Leaderboard </th>
+                    <th colSpan="2">Leaderboard</th>
                   </tr>
                 </thead>
                 <tbody>
